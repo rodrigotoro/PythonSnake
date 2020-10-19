@@ -21,7 +21,7 @@ class Snake():
 
     def __init__(self, pos_x, pos_y):
         self.size = 20
-        self.speed = 1
+        self.speed = 3
         self.head = SnakeSegment(self.size, pos_x, pos_y, colour = (200, 255, 200))
         self.vel_x = 0
         self.vel_y = 0
@@ -61,12 +61,19 @@ class Snake():
         self.head.rect.move_ip(self.vel_x, self.vel_y)
 
         # Update tail positions based on tail_pos arrays
-        displacement = self.size + 5
+        displacement = int(self.size / self.speed) + 1
         for i, segment in enumerate(self.tail):
             if len(self.tail_pos_x) > (i + 1) * displacement:
                 segment.update(
                     self.tail_pos_x[- (i + 1) * displacement], 
                     self.tail_pos_y[- (i + 1) * displacement])
+        
+        # Clean up tail_pos arrays
+        tail_positions_length = len(self.tail_pos_x)
+        required_length = (len(self.tail) + 1) * displacement
+        if tail_positions_length > required_length:
+            self.tail_pos_x = self.tail_pos_x[-required_length:]
+            self.tail_pos_y = self.tail_pos_y[-required_length:]
 
 
     def draw(self, surface):
