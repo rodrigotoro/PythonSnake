@@ -13,7 +13,8 @@ class SnakeSegment(pygame.sprite.Sprite):
 
 
     def update(self, pos_x, pos_y):
-        self.rect.move_ip(pos_x, pos_y)
+        self.rect.centerx = pos_x
+        self.rect.centery = pos_y
 
 
 class Snake():
@@ -26,8 +27,11 @@ class Snake():
         self.vel_y = 0
         self.tail_pos_x = []
         self.tail_pos_y = []
-        self.tail = pygame.sprite.Group()
-        self.tail.add(SnakeSegment(self.size, pos_x, pos_y))
+        self.tail = []
+        self.tail.append(SnakeSegment(self.size, pos_x, pos_y))
+        self.tail.append(SnakeSegment(self.size, pos_x, pos_y))
+        self.all_segments = pygame.sprite.Group()
+        self.all_segments.add(self.head, *self.tail)
 
         
     def update_velocity(self, pressed_keys):
@@ -57,17 +61,21 @@ class Snake():
         self.head.rect.move_ip(self.vel_x, self.vel_y)
 
         # Update tail positions based on tail_pos arrays
-        for i, segment in enumerate(self.tail.sprites()):
-            segment.update(self.tail_pos_x[-i * 1000], self.tail_pos_y[-i * 1000])
+        displacement = self.size + 5
+        for i, segment in enumerate(self.tail):
+            if len(self.tail_pos_x) > (i + 1) * displacement:
+                segment.update(
+                    self.tail_pos_x[- (i + 1) * displacement], 
+                    self.tail_pos_y[- (i + 1) * displacement])
 
 
     def draw(self, surface):
-        surface.blit(self.head.image, self.head.rect)
-        self.tail.draw(surface)
+        self.all_segments.draw(surface)
 
 
 if __name__ == "__main__":
     pygame.init()
+    clock = pygame.time.Clock()
 
     WINDOW_WIDTH = 500
     WINDOW_HEIGHT = 500
@@ -78,6 +86,8 @@ if __name__ == "__main__":
     snake = Snake(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2)
 
     while running:
+
+        clock.tick(60)
 
         for event in pygame.event.get():
             if event.type == QUIT:
