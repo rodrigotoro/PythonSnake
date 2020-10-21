@@ -1,6 +1,10 @@
 import pygame
 from pygame.locals import *
 
+# Initialise pygame
+pygame.init()
+
+# SnakeSegment and Snake classes
 class SnakeSegment(pygame.sprite.Sprite):
 
     def __init__(self, size, pos_x, pos_y, colour=(100, 255, 100)):
@@ -27,13 +31,21 @@ class Snake():
         self.vel_y = 0
         self.tail_pos_x = []
         self.tail_pos_y = []
-        self.tail = []
-        self.tail.append(SnakeSegment(self.size, pos_x, pos_y))
-        self.tail.append(SnakeSegment(self.size, pos_x, pos_y))
+        self.tail = [] # tail segment objects go here
         self.all_segments = pygame.sprite.Group()
+        self.initial_tail_length = 2
+        for i in range(self.initial_tail_length):
+            self.tail.append(SnakeSegment(self.size, pos_x, pos_y))
         self.all_segments.add(self.head, *self.tail)
 
-        
+
+    def grow(self):
+        last_segment_pos_x = self.tail[-1].rect.centerx
+        last_segment_pos_y = self.tail[-1].rect.centery
+        self.tail.append(SnakeSegment(self.size, last_segment_pos_x, last_segment_pos_y))
+        self.all_segments.add(self.tail[-1])
+
+
     def update_velocity(self, pressed_keys):
         if pressed_keys[K_RIGHT] and self.vel_x != -self.speed:
             self.vel_x = self.speed
@@ -76,24 +88,36 @@ class Snake():
             self.tail_pos_y = self.tail_pos_y[-required_length:]
 
 
+
     def draw(self, surface):
         self.all_segments.draw(surface)
 
+# Apple class
+class Apple(pygame.sprite.Sprite):
 
-if __name__ == "__main__":
+    def __init__(self, pos_x, pos_y):
+        super().__init__()
+        self.size = 10
+        self.image = pygame.surface.Surface((self.size, self.size))
+        self.image.fill((255, 150, 200))
+        self.rect = self.image.get_rect()
+
+
+# Main game loop function
+def game_loop():
     pygame.init()
     clock = pygame.time.Clock()
 
-    WINDOW_WIDTH = 500
-    WINDOW_HEIGHT = 500
-    screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+    screen_width = 500
+    screen_height = 500
+    screen = pygame.display.set_mode((screen_width, screen_height))
 
     running = True
 
-    snake = Snake(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2)
+    snake = Snake(screen_width / 2, screen_height / 2)
 
     while running:
-
+        
         clock.tick(60)
 
         for event in pygame.event.get():
@@ -104,7 +128,17 @@ if __name__ == "__main__":
         
         pressed_keys = pygame.key.get_pressed()
 
+        if pressed_keys[K_SPACE]:
+            snake.grow()
+
         snake.update(pressed_keys)
         snake.draw(screen)
 
         pygame.display.update()
+
+
+# Run the game loop
+game_loop()
+
+# Shut down pygame once the game loop ends
+pygame.quit()
