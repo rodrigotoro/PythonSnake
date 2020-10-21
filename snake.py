@@ -36,7 +36,7 @@ class Snake():
         self.initial_tail_length = 2
         for i in range(self.initial_tail_length):
             self.tail.append(SnakeSegment(self.size, pos_x, pos_y))
-        self.all_segments.add(self.head, *self.tail)
+        self.all_segments.add(*self.tail, self.head)
 
 
     def grow(self):
@@ -88,9 +88,9 @@ class Snake():
             self.tail_pos_y = self.tail_pos_y[-required_length:]
 
 
-
     def draw(self, surface):
         self.all_segments.draw(surface)
+
 
 # Apple class
 class Apple(pygame.sprite.Sprite):
