@@ -19,8 +19,6 @@ class Snake(pygame.sprite.Sprite):
         self.speed = 5
         self.velocity_x = 0
         self.velocity_y = 0
-        # self.segments = ["segment1", "segment2"]
-        # self.trail_positions = [(x, y), (x, y)]
 
 
     def update(self, pressed_keys):
