@@ -1,13 +1,16 @@
 import pygame
 from pygame.locals import *
 
+GREEN = (0, 255, 0)
+CYAN = (0, 255, 255)
+
 # Initialise pygame
 pygame.init()
 
 # SnakeSegment and Snake classes
 class SnakeSegment(pygame.sprite.Sprite):
 
-    def __init__(self, size, pos_x, pos_y, colour=(100, 255, 100)):
+    def __init__(self, size, pos_x, pos_y, colour=GREEN):
         super().__init__()
         self.size = size
         self.image = pygame.surface.Surface((self.size, self.size))
@@ -26,7 +29,7 @@ class Snake():
     def __init__(self, pos_x, pos_y):
         self.size = 20
         self.speed = 3
-        self.head = SnakeSegment(self.size, pos_x, pos_y, colour = (200, 255, 200))
+        self.head = SnakeSegment(self.size, pos_x, pos_y, colour = CYAN)
         self.vel_x = 0
         self.vel_y = 0
         self.tail_pos_x = []
