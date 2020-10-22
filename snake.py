@@ -1,8 +1,10 @@
 import pygame
 from pygame.locals import *
+import random
 
 GREEN = (0, 255, 0)
 CYAN = (0, 255, 255)
+RED = (255, 0, 0)
 
 # Initialise pygame
 pygame.init()
@@ -98,12 +100,14 @@ class Snake():
 # Apple class
 class Apple(pygame.sprite.Sprite):
 
-    def __init__(self, pos_x, pos_y):
+    def __init__(self, max_x, max_y):
         super().__init__()
         self.size = 10
         self.image = pygame.surface.Surface((self.size, self.size))
-        self.image.fill((255, 150, 200))
-        self.rect = self.image.get_rect()
+        self.image.fill(RED)
+        self.pos_x = random.randint(0, max_x)
+        self.pos_y = random.randint(0, max_y)
+        self.rect = self.image.get_rect(center = (self.pos_x, self.pos_y))
 
 
 # Main game loop function
@@ -118,6 +122,8 @@ def game_loop():
     running = True
 
     snake = Snake(screen_width / 2, screen_height / 2)
+    apple = Apple(screen_width, screen_height)
+    delete_apple_timer = 0
 
     while running:
         
@@ -128,6 +134,16 @@ def game_loop():
                 running = False
         
         screen.fill((0, 0, 0))
+
+        if apple is None:
+            apple = Apple(screen_width, screen_height)
+        
+        screen.blit(apple.image, apple.rect)
+
+        if delete_apple_timer % (60 * 5) == 0:
+            apple = None
+        delete_apple_timer += 1
+
         
         pressed_keys = pygame.key.get_pressed()
 
