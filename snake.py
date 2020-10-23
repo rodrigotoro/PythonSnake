@@ -39,7 +39,7 @@ class Snake():
         self.tail = [] # tail segment objects go here
         self.all_segments = pygame.sprite.Group()
         self.initial_tail_length = 2
-        for i in range(self.initial_tail_length):
+        for _ in range(self.initial_tail_length):
             self.tail.append(SnakeSegment(self.size, pos_x, pos_y))
         self.all_segments.add(*self.tail, self.head)
 
@@ -66,7 +66,7 @@ class Snake():
             self.vel_y = self.speed
 
 
-    def update(self, pressed_keys):
+    def update(self, pressed_keys, screen_width, screen_height):
         # Append head's position to history
         self.tail_pos_x.append(self.head.rect.centerx)
         self.tail_pos_y.append(self.head.rect.centery)
@@ -76,6 +76,14 @@ class Snake():
 
         # Update head position based on velocity
         self.head.rect.move_ip(self.vel_x, self.vel_y)
+        if self.head.rect.right < 0:
+            self.head.rect.left = screen_width
+        if self.head.rect.left > screen_width:
+            self.head.rect.right = 0
+        if self.head.rect.bottom < 0:
+            self.head.rect.top = screen_height
+        if self.head.rect.top > screen_height:
+            self.head.rect.bottom = 0
 
         # Update tail positions based on tail_pos arrays
         displacement = int(self.size / self.speed) + 1
@@ -123,7 +131,6 @@ def game_loop():
 
     snake = Snake(screen_width / 2, screen_height / 2)
     apple = Apple(screen_width, screen_height)
-    delete_apple_timer = 0
 
     while running:
         
@@ -140,23 +147,22 @@ def game_loop():
         
         screen.blit(apple.image, apple.rect)
 
-        if delete_apple_timer % (60 * 5) == 0:
+        if pygame.sprite.collide_rect(snake.head, apple):
+            snake.grow()
             apple = None
-        delete_apple_timer += 1
-
         
         pressed_keys = pygame.key.get_pressed()
 
         if pressed_keys[K_SPACE]:
             snake.grow()
 
-        snake.update(pressed_keys)
+        snake.update(pressed_keys, screen_width, screen_height)
         snake.draw(screen)
 
         pygame.display.update()
 
 
-# Run the game loop
+# Run the game
 game_loop()
 
 # Shut down pygame once the game loop ends
