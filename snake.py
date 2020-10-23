@@ -43,12 +43,16 @@ class Snake():
             self.tail.append(SnakeSegment(self.size, pos_x, pos_y))
         self.all_segments.add(*self.tail, self.head)
 
+        # Tail sprites grouped for collision detection
+        self.tail_sprites = pygame.sprite.Group()
+
 
     def grow(self):
         last_segment_pos_x = self.tail[-1].rect.centerx
         last_segment_pos_y = self.tail[-1].rect.centery
         self.tail.append(SnakeSegment(self.size, last_segment_pos_x, last_segment_pos_y))
         self.all_segments.add(self.tail[-1])
+        self.tail_sprites.add(self.tail[-1])
 
 
     def update_velocity(self, pressed_keys):
@@ -76,6 +80,8 @@ class Snake():
 
         # Update head position based on velocity
         self.head.rect.move_ip(self.vel_x, self.vel_y)
+
+        # Enforce world limits
         if self.head.rect.right < 0:
             self.head.rect.left = screen_width
         if self.head.rect.left > screen_width:
@@ -132,6 +138,8 @@ def game_loop():
     snake = Snake(screen_width / 2, screen_height / 2)
     apple = Apple(screen_width, screen_height)
 
+    collided = False
+
     while running:
         
         clock.tick(60)
@@ -153,17 +161,24 @@ def game_loop():
         
         pressed_keys = pygame.key.get_pressed()
 
-        if pressed_keys[K_SPACE]:
-            snake.grow()
+        tail_collision = pygame.sprite.spritecollide(snake.head, snake.tail_sprites, dokill = False)
+        if tail_collision:
+            collided = True
+            running = False
 
         snake.update(pressed_keys, screen_width, screen_height)
         snake.draw(screen)
 
         pygame.display.update()
+    
+    return collided
 
 
 # Run the game
-game_loop()
+collided = game_loop()
+
+if collided:
+    pygame.time.wait(5000)
 
 # Shut down pygame once the game loop ends
 pygame.quit()
