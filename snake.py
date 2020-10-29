@@ -161,7 +161,7 @@ def game_loop():
         
         pressed_keys = pygame.key.get_pressed()
 
-        tail_collision = pygame.sprite.spritecollide(snake.head, snake.tail_sprites, dokill = False)
+        tail_collision = pygame.sprite.spritecollideany(snake.head, snake.tail_sprites)
         if tail_collision:
             collided = True
             running = False
