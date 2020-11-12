@@ -20,7 +20,7 @@ class Button(pygame.sprite.Sprite):
             center=(self.pos_x, self.pos_y)
             )
         self.action = action
-    
+
     def draw(self, surface):
         surface.blit(self.image, self.rect)
         surface.blit(self.font_image, self.font_rect)
