@@ -2,37 +2,78 @@ import pygame
 from pygame.locals import *
 from snake import Snake
 from apple import Apple
+from button import Button
 
 
 # Main menu function
 def main_menu():
-    pass
+    running = True
+    end_game = False
+
+    def next_scene():
+        nonlocal running
+        running = False
+
+    while running:
+        CLOCK.tick(30)
+        pressed_keys = pygame.key.get_pressed()
+        mouse_clicked = False
+
+        for event in pygame.event.get():
+            if event.type == QUIT or pressed_keys[K_ESCAPE]:
+                running = False
+                end_game = True
+            if event.type == MOUSEBUTTONUP:
+                mouse_clicked = True
+
+        SCREEN.fill((0, 0, 0))
+
+        title_font = pygame.font.Font(None, 60)
+        title_image = title_font.render("PYTHON SNAKE", True, (0, 255, 0))
+        title_rect = title_image.get_rect(center=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - 50))
+        SCREEN.blit(title_image, title_rect)
+
+        start_game_button = Button(
+            position=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 50),
+            size=(200, 50),
+            colour=(0, 255, 0),
+            text="Start Game",
+            text_colour=(0, 0, 0),
+            action=next_scene
+        )
+        start_game_button.draw(SCREEN)
+        start_game_button.update(mouse_clicked)
+
+        pygame.display.update()
+
+    return end_game
+
 
 
 # Game loop function
 def game_loop():
     running = True
 
-    snake = Snake(screen_width / 2, screen_height / 2)
-    apple = Apple(screen_width, screen_height)
+    snake = Snake(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+    apple = Apple(SCREEN_WIDTH, SCREEN_HEIGHT)
     score = 0
 
     collided = False
 
     while running:
-        clock.tick(60)
+        CLOCK.tick(60)
         pressed_keys = pygame.key.get_pressed()
 
         for event in pygame.event.get():
             if event.type == QUIT or pressed_keys[K_ESCAPE]:
                 running = False
 
-        screen.fill((0, 0, 0))
+        SCREEN.fill((0, 0, 0))
 
         if apple is None:
-            apple = Apple(screen_width, screen_height)
+            apple = Apple(SCREEN_WIDTH, SCREEN_HEIGHT)
 
-        screen.blit(apple.image, apple.rect)
+        SCREEN.blit(apple.image, apple.rect)
 
         if pygame.sprite.collide_rect(snake.head, apple):
             score += 1
@@ -46,8 +87,8 @@ def game_loop():
             collided = True
             running = False
 
-        snake.update(pressed_keys, screen_width, screen_height)
-        snake.draw(screen)
+        snake.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT)
+        snake.draw(SCREEN)
 
         pygame.display.update()
 
@@ -56,14 +97,16 @@ def game_loop():
 
 # Initialise game
 pygame.init()
-clock = pygame.time.Clock()
-screen_width = 500
-screen_height = 500
-screen = pygame.display.set_mode((screen_width, screen_height))
+CLOCK = pygame.time.Clock()
+SCREEN_WIDTH = 500
+SCREEN_HEIGHT = 500
+SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 # Run game
-main_menu()
-collided = game_loop()
+end_game = main_menu()
+
+if not end_game:
+    collided = game_loop()
 
 if collided:
     pygame.time.wait(5000)

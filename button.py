@@ -26,7 +26,8 @@ class Button(pygame.sprite.Sprite):
         surface.blit(self.font_image, self.font_rect)
 
     def on_click(self):
-        return self.action()
+        if self.action is not None:
+            return self.action()
 
     def update(self, mouse_clicked):
         if mouse_clicked:
