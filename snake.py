@@ -9,6 +9,7 @@ RED = (255, 0, 0)
 # Initialise pygame
 pygame.init()
 
+
 # SnakeSegment and Snake classes
 class SnakeSegment(pygame.sprite.Sprite):
 
@@ -18,8 +19,7 @@ class SnakeSegment(pygame.sprite.Sprite):
         self.image = pygame.surface.Surface((self.size, self.size))
         self.colour = colour
         self.image.fill(self.colour)
-        self.rect = self.image.get_rect(center = (pos_x, pos_y))
-
+        self.rect = self.image.get_rect(center=(pos_x, pos_y))
 
     def update(self, pos_x, pos_y):
         self.rect.centerx = pos_x
@@ -31,12 +31,12 @@ class Snake():
     def __init__(self, pos_x, pos_y):
         self.size = 20
         self.speed = 3
-        self.head = SnakeSegment(self.size, pos_x, pos_y, colour = CYAN)
+        self.head = SnakeSegment(self.size, pos_x, pos_y, colour=CYAN)
         self.vel_x = 0
         self.vel_y = 0
         self.tail_pos_x = []
         self.tail_pos_y = []
-        self.tail = [] # tail segment objects go here
+        self.tail = []
         self.all_segments = pygame.sprite.Group()
         self.initial_tail_length = 2
         for _ in range(self.initial_tail_length):
@@ -46,14 +46,14 @@ class Snake():
         # Tail sprites grouped for collision detection
         self.tail_sprites = pygame.sprite.Group()
 
-
     def grow(self):
         last_segment_pos_x = self.tail[-1].rect.centerx
         last_segment_pos_y = self.tail[-1].rect.centery
-        self.tail.append(SnakeSegment(self.size, last_segment_pos_x, last_segment_pos_y))
+        self.tail.append(SnakeSegment(
+            self.size, last_segment_pos_x, last_segment_pos_y)
+            )
         self.all_segments.add(self.tail[-1])
         self.tail_sprites.add(self.tail[-1])
-
 
     def update_velocity(self, pressed_keys):
         if pressed_keys[K_RIGHT] and self.vel_x != -self.speed:
@@ -68,7 +68,6 @@ class Snake():
         if pressed_keys[K_DOWN] and self.vel_y != -self.speed:
             self.vel_x = 0
             self.vel_y = self.speed
-
 
     def update(self, pressed_keys, screen_width, screen_height):
         # Append head's position to history
@@ -96,16 +95,15 @@ class Snake():
         for i, segment in enumerate(self.tail):
             if len(self.tail_pos_x) > (i + 1) * displacement:
                 segment.update(
-                    self.tail_pos_x[- (i + 1) * displacement], 
+                    self.tail_pos_x[- (i + 1) * displacement],
                     self.tail_pos_y[- (i + 1) * displacement])
-        
+
         # Clean up tail_pos arrays
         tail_positions_length = len(self.tail_pos_x)
         required_length = (len(self.tail) + 1) * displacement
         if tail_positions_length > required_length:
             self.tail_pos_x = self.tail_pos_x[-required_length:]
             self.tail_pos_y = self.tail_pos_y[-required_length:]
-
 
     def draw(self, surface):
         self.all_segments.draw(surface)
@@ -121,7 +119,7 @@ class Apple(pygame.sprite.Sprite):
         self.image.fill(RED)
         self.pos_x = random.randint(0, max_x)
         self.pos_y = random.randint(0, max_y)
-        self.rect = self.image.get_rect(center = (self.pos_x, self.pos_y))
+        self.rect = self.image.get_rect(center=(self.pos_x, self.pos_y))
 
 
 # Main game loop function
@@ -141,27 +139,28 @@ def game_loop():
     collided = False
 
     while running:
-        
+
         clock.tick(60)
 
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
-        
+
         screen.fill((0, 0, 0))
 
         if apple is None:
             apple = Apple(screen_width, screen_height)
-        
+
         screen.blit(apple.image, apple.rect)
 
         if pygame.sprite.collide_rect(snake.head, apple):
             snake.grow()
             apple = None
-        
+
         pressed_keys = pygame.key.get_pressed()
 
-        tail_collision = pygame.sprite.spritecollideany(snake.head, snake.tail_sprites)
+        tail_collision = pygame.sprite.spritecollideany(
+            snake.head, snake.tail_sprites)
         if tail_collision:
             collided = True
             running = False
@@ -170,7 +169,7 @@ def game_loop():
         snake.draw(screen)
 
         pygame.display.update()
-    
+
     return collided
 
 
