@@ -3,9 +3,6 @@ from pygame.locals import *
 from snake import Snake
 from apple import Apple
 
-# Initialise pygame
-pygame.init()
-
 
 # Main menu function
 def main_menu():
@@ -14,26 +11,20 @@ def main_menu():
 
 # Game loop function
 def game_loop():
-    pygame.init()
-    clock = pygame.time.Clock()
-
-    screen_width = 500
-    screen_height = 500
-    screen = pygame.display.set_mode((screen_width, screen_height))
-
     running = True
 
     snake = Snake(screen_width / 2, screen_height / 2)
     apple = Apple(screen_width, screen_height)
+    score = 0
 
     collided = False
 
     while running:
-
         clock.tick(60)
+        pressed_keys = pygame.key.get_pressed()
 
         for event in pygame.event.get():
-            if event.type == QUIT:
+            if event.type == QUIT or pressed_keys[K_ESCAPE]:
                 running = False
 
         screen.fill((0, 0, 0))
@@ -44,10 +35,10 @@ def game_loop():
         screen.blit(apple.image, apple.rect)
 
         if pygame.sprite.collide_rect(snake.head, apple):
+            score += 1
+            print(score)
             snake.grow()
             apple = None
-
-        pressed_keys = pygame.key.get_pressed()
 
         tail_collision = pygame.sprite.spritecollideany(
             snake.head, snake.tail_sprites)
@@ -63,12 +54,19 @@ def game_loop():
     return collided
 
 
-# Run the game
+# Initialise game
+pygame.init()
+clock = pygame.time.Clock()
+screen_width = 500
+screen_height = 500
+screen = pygame.display.set_mode((screen_width, screen_height))
+
+# Run game
 main_menu()
 collided = game_loop()
 
 if collided:
     pygame.time.wait(5000)
 
-# Shut down pygame once the game loop ends
+# Shut down pygame
 pygame.quit()
