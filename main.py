@@ -28,10 +28,17 @@ def main_menu():
 
         SCREEN.fill((0, 0, 0))
 
-        title_font = pygame.font.Font(None, 60)
-        title_image = title_font.render("PYTHON SNAKE", True, (0, 255, 0))
-        title_rect = title_image.get_rect(center=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - 50))
-        SCREEN.blit(title_image, title_rect)
+        title_1_font = pygame.font.SysFont("courier", 60)
+        title_1_image = title_1_font.render("PYTHON", True, (0, 255, 0))
+        title_1_rect = title_1_image.get_rect(
+            center=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - 120))
+        SCREEN.blit(title_1_image, title_1_rect)
+
+        title_2_font = pygame.font.SysFont("courier", 60)
+        title_2_image = title_2_font.render("SNAKE", True, (0, 255, 0))
+        title_2_rect = title_2_image.get_rect(
+            center=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - 50))
+        SCREEN.blit(title_2_image, title_2_rect)
 
         start_game_button = Button(
             position=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 50),
@@ -47,7 +54,6 @@ def main_menu():
         pygame.display.update()
 
     return end_game
-
 
 
 # Game loop function
