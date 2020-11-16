@@ -58,7 +58,9 @@ def main_menu():
 
 # Game loop function
 def game_loop():
+    framerate = 60
     running = True
+    paused = False
 
     snake = Snake(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
     apple = Apple(SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -67,12 +69,14 @@ def game_loop():
     collided = False
 
     while running:
-        CLOCK.tick(60)
+        CLOCK.tick(framerate)
         pressed_keys = pygame.key.get_pressed()
 
         for event in pygame.event.get():
             if event.type == QUIT or pressed_keys[K_ESCAPE]:
                 running = False
+            if event.type == KEYDOWN and event.key == K_SPACE:
+                paused = not paused
 
         SCREEN.fill((0, 0, 0))
 
@@ -93,7 +97,8 @@ def game_loop():
             collided = True
             running = False
 
-        snake.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT)
+        if not paused:
+            snake.update(pressed_keys, SCREEN_WIDTH, SCREEN_HEIGHT)
         snake.draw(SCREEN)
 
         pygame.display.update()
