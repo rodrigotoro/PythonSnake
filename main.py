@@ -73,7 +73,9 @@ def game_loop():
         pressed_keys = pygame.key.get_pressed()
 
         for event in pygame.event.get():
-            if event.type == QUIT or pressed_keys[K_ESCAPE]:
+            if event.type == QUIT:
+                running = False
+            if event.type == KEYDOWN and event.key == K_ESCAPE:
                 running = False
             if event.type == KEYDOWN and event.key == K_SPACE:
                 paused = not paused
