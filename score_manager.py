@@ -20,14 +20,17 @@ class ScoreManager:
     def add_score(self, name, score):
         self.cursor.execute("""INSERT INTO scores (timestamp, name, score)
         VALUES (?, ?, ?)""",
-        str(datetime.datetime.timestamp(datetime.datetime.now())),
+        (str(datetime.datetime.timestamp(datetime.datetime.now())),
         name,
-        score)
+        score))
         self.connection.commit()
 
     def get_scores(self):
-        self.cursor.execute("SELECT * FROM scores ORDER DESC score")
-        return self.cursor.fetchall()
+        self.cursor.execute("SELECT * FROM scores ORDER BY score DESC")
+        return self.cursor.fetchmany(5)
+
+    def disconnect(self):
+        self.connection.close()
 
 
 if __name__ == "__main__":
