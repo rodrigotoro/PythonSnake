@@ -10,34 +10,38 @@ from score_manager import ScoreManager
 def main_menu():
     running = True
     framerate = 30
-    end_game = False
+    insert_next_scene = None
 
     def next_scene():
         nonlocal running
         running = False
 
-    title_font = pygame.font.SysFont("courier", 60)
+    def show_highscores():
+        nonlocal running
+        nonlocal insert_next_scene
+        running = False
+        insert_next_scene = highscores
+
+    title_font = pygame.font.SysFont("courier", 100)
 
     while running:
         CLOCK.tick(framerate)
-        pressed_keys = pygame.key.get_pressed()
         mouse_clicked = False
 
         for event in pygame.event.get():
-            if event.type == QUIT or pressed_keys[K_ESCAPE]:
-                running = False
-                end_game = True
+            if event.type == QUIT:
+                return "quit"
+            if event.type == KEYDOWN and event.key == K_ESCAPE:
+                return "quit"
             if event.type == MOUSEBUTTONUP:
                 mouse_clicked = True
 
         SCREEN.fill((0, 0, 0))
 
-
         title_1_image = title_font.render("PYTHON", True, (0, 255, 0))
         title_1_rect = title_1_image.get_rect(
-            center=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - 120))
+            center=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - 150))
         SCREEN.blit(title_1_image, title_1_rect)
-
 
         title_2_image = title_font.render("SNAKE", True, (0, 255, 0))
         title_2_rect = title_2_image.get_rect(
@@ -45,7 +49,7 @@ def main_menu():
         SCREEN.blit(title_2_image, title_2_rect)
 
         start_game_button = Button(
-            position=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 50),
+            position=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 75),
             size=(200, 50),
             colour=(0, 255, 0),
             text="Start Game",
@@ -55,9 +59,20 @@ def main_menu():
         start_game_button.draw(SCREEN)
         start_game_button.update(mouse_clicked)
 
+        highscores_button = Button(
+            position=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + 150),
+            size=(200, 50),
+            colour=(0, 255, 0),
+            text="High Scores",
+            text_colour=(0, 0, 0),
+            action=show_highscores
+        )
+        highscores_button.draw(SCREEN)
+        highscores_button.update(mouse_clicked)
+
         pygame.display.update()
 
-    return end_game
+    return insert_next_scene
 
 
 # Game loop function
@@ -65,6 +80,7 @@ def game_loop():
     framerate = 60
     running = True
     paused = False
+    insert_next_scene = None
 
     snake = Snake(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
     apple = Apple(SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -80,9 +96,9 @@ def game_loop():
 
         for event in pygame.event.get():
             if event.type == QUIT:
-                running = False
+                return "quit"
             if event.type == KEYDOWN and event.key == K_ESCAPE:
-                running = False
+                return "quit"
             if event.type == KEYDOWN and event.key == K_SPACE:
                 paused = not paused
 
@@ -101,7 +117,6 @@ def game_loop():
         tail_collision = pygame.sprite.spritecollideany(
             snake.head, snake.tail_sprites)
         if tail_collision:
-            collided = True
             running = False
 
         if not paused:
@@ -115,11 +130,14 @@ def game_loop():
 
         pygame.display.update()
 
+    return insert_next_scene
+
 
 # Game over scene
 def game_over():
     running = True
     framerate = 30
+    insert_next_scene = None
 
     game_over_font = pygame.font.Font(None, 60)
     game_over_displayed_frames = 0
@@ -133,9 +151,9 @@ def game_over():
         for event in pygame.event.get():
             # Exit behaviours
             if event.type == QUIT:
-                running = False
+                return "quit"
             if event.type == KEYDOWN and event.key == K_ESCAPE:
-                running = False
+                return "quit"
 
             # Name input mechanic
             if event.type == KEYDOWN and event.key != K_ESCAPE:
@@ -195,33 +213,45 @@ def game_over():
             SCREEN.blit(player_name_image, player_name_rect)
 
         pygame.display.update()
+    
+    return insert_next_scene
 
 
 # Highscore Scene
 def highscores():
     running = True
     framerate = 30
+    insert_next_scene = None
 
-    score_title_font = pygame.font.Font(None, 100)
-    score_font = pygame.font.Font(None, 50)
+    def return_to_main_menu():
+        nonlocal running
+        nonlocal insert_next_scene
+        running = False
+        insert_next_scene = main_menu
+
+    score_title_font = pygame.font.SysFont("courier", 70)
+    score_font = pygame.font.Font(None, 40)
 
     highscores = SCORE_MANAGER.get_scores()
 
     while running:
         CLOCK.tick(framerate)
+        mouse_clicked = False
 
         for event in pygame.event.get():
             # Exit behaviours
             if event.type == QUIT:
-                running = False
+                return "quit"
             if event.type == KEYDOWN and event.key == K_ESCAPE:
-                running = False
+                return "quit"
+            if event.type == MOUSEBUTTONUP:
+                mouse_clicked = True
 
         SCREEN.fill((0, 0, 0))
 
         score_title_image = score_title_font.render("High Scores", True, (0, 255, 0))
         score_title_rect = score_title_image.get_rect(
-            center=(SCREEN_WIDTH/2, 120)
+            center=(SCREEN_WIDTH/2, 90)
         )
         SCREEN.blit(score_title_image, score_title_rect)
 
@@ -239,15 +269,27 @@ def highscores():
             highscore_name_image = score_font.render(highscore_name, True, font_colour)
             highscore_number_image = score_font.render(highscore_number, True, font_colour)
             x = SCREEN_WIDTH / 2
-            y = 150 + (70 * (i + 1))
+            y = 120 + (50 * (i + 1))
             highscore_name_rect = highscore_name_image.get_rect(right=x, top=y)
             highscore_number_rect = highscore_number_image.get_rect(left=x+20, top=y)
 
             SCREEN.blit(highscore_name_image, highscore_name_rect)
             SCREEN.blit(highscore_number_image, highscore_number_rect)
 
+        main_menu_button = Button(
+            position=(SCREEN_WIDTH/2, SCREEN_HEIGHT - 100),
+            size=(200, 50),
+            colour=(0, 255, 0),
+            text="Main Menu",
+            text_colour=(0, 0, 0),
+            action=return_to_main_menu
+        )
+        main_menu_button.draw(SCREEN)
+        main_menu_button.update(mouse_clicked)
+
         pygame.display.update()
 
+    return insert_next_scene
 
 
 # Initialise game
@@ -263,13 +305,16 @@ SCORE_MANAGER = ScoreManager()
 SCORE_MANAGER.connect()
 
 # Run game
-end_game = main_menu()
+scene_queue = [main_menu, game_loop, game_over, highscores]
 
-if not end_game:
-    score = game_loop()
-
-game_over()
-highscores()
+while len(scene_queue) > 0:
+    current_scene = scene_queue.pop(0)
+    insert_next_scene = current_scene()
+    if insert_next_scene is not None:
+        if insert_next_scene == "quit":
+            break
+        else:
+            scene_queue.insert(0, insert_next_scene)
 
 # Shut down the game
 SCORE_MANAGER.disconnect()

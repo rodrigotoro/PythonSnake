@@ -26,7 +26,7 @@ class ScoreManager:
         self.connection.commit()
 
     def get_scores(self):
-        self.cursor.execute("SELECT * FROM scores ORDER BY score DESC")
+        self.cursor.execute("SELECT * FROM scores ORDER BY score DESC, timestamp ASC")
         return self.cursor.fetchmany(5)
 
     def disconnect(self):
